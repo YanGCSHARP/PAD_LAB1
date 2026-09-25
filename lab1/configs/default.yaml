@@ -1,0 +1,95 @@
+# Базовая конфигурация RAG-системы по Dota 2.
+# Любой параметр можно переопределить из CLI: --set retrieval.top_k=10
+
+paths:
+  data: data
+  raw: data/raw              # сырые ответы источников (JSON/HTML)
+  documents: data/documents  # распарсенные документы (единый формат)
+  manifest: data/manifest.db # состояние grabber'а (SQLite)
+  cache: data/cache          # кэш эмбеддингов и ответов LLM
+  qdrant: data/qdrant        # локальное хранилище Qdrant (embedded mode)
+
+grabber:
+  user_agent: "RagLabStudent/0.1 (university RAG lab; contact: ferlik1988@gmail.com)"
+  request_delay_sec: 0.35    # вежливая пауза между запросами
+  timeout_sec: 30
+  max_retries: 5
+
+  official:
+    enabled: true
+    base_url: https://www.dota2.com/datafeed
+    language: russian
+    heroes: true
+    items: true
+    patches_last: 6          # сколько последних патчей забирать
+
+  fandom:
+    enabled: true
+    api_url: https://dota2.fandom.com/api.php
+    page_url: https://dota2.fandom.com/wiki/
+    heroes_from_official: true   # список героев берём у официального источника
+    categories: [Mechanics, Gameplay]
+    skip_subpages: true          # "Armor/Old Mechanics" и т.п.
+    # секции, которые не несут знаний для RAG (удаляем как шум)
+    skip_sections:
+      - Recent Changes
+      - Recommended Items
+      - Dota Plus Progress
+      - Equipment
+      - Gallery
+      - Sounds
+      - Version History
+      - Patch History
+      - See also
+      - References
+      - External links
+      - Cosmetics
+
+# ---------------------------------------------------------------- pipeline
+chunking:
+  strategy: section        # fixed | paragraph | section
+  size: 256                # токенов (токенизатор XLM-R)
+  overlap: 0               # токенов, только для fixed
+  prefix_title: true       # "Название — Секция" в начале chunk
+
+embedding:
+  model: e5-small          # e5-small | e5-base | minilm | bge-m3 (см. src/embeddings)
+
+vector_store:
+  url: http://localhost:6333   # Qdrant в Docker (docker compose up -d); null → embedded-режим
+
+retrieval:
+  mode: dense              # dense | bm25 | hybrid
+  top_k: 20                # сколько кандидатов достаём из индекса
+  filters: {}              # фильтр по metadata, напр. {source: official, entity_type: [hero, item]}
+
+filtering:
+  score_threshold: 0.0     # минимальный cosine score (0 — выключено)
+  min_chars: 60
+  dedup: true
+  max_per_doc: 0
+
+reranker:
+  enabled: true
+  model: mminilm           # mminilm | bge-m3
+  top_n: 5                 # сколько chunks уходит в LLM
+  min_score: 0.0           # порог релевантности после rerank (0 — выключено)
+
+generation:
+  provider: groq
+  model: openai/gpt-oss-120b
+  prompt: strict           # strict | basic
+  temperature: 0.0
+  max_tokens: 1500
+
+judge:
+  provider: gemini
+  model: gemini-3.8-flash
+  temperature: 0.0
+  max_tokens: 2000
+
+# особые параметры моделей (передаются в extra_body запроса)
+llm_models:
+  openai/gpt-oss-120b: {extra: {reasoning_effort: low}}
+  openai/gpt-oss-20b: {extra: {reasoning_effort: low}}
+  qwen/qwen3.8-27b: {extra: {reasoning_effort: none}}

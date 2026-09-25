@@ -1,0 +1,25 @@
+# секреты
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# данные пересобираются grabber'ом и индексатором
+lab1/data/*
+!lab1/data/eval/
+
+# .NET (Blazor UI)
+bin/
+obj/
+*.user
+.vs/
+
+# Office lock files
+~$*
+
+# собранный Blazor WebAssembly (dotnet publish → lab1/ui/dist)
+lab1/ui/dist/

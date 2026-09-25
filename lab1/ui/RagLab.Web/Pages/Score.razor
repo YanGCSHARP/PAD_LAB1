@@ -1,0 +1,12 @@
+@* Полоска-индикатор скора релевантности (0..1). *@
+<span class="score">
+    <span class="score-label">@Label</span>
+    <span class="bar"><span class="fill" style="width:@Pct%"></span></span>
+    <span class="score-value">@(Value is null ? "—" : Value.Value.ToString("0.000"))</span>
+</span>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public double? Value { get; set; }
+    private string Pct => ((Value ?? 0) * 100).ToString("0", System.Globalization.CultureInfo.InvariantCulture);
+}

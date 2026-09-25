@@ -1,0 +1,238 @@
+@page "/"
+@using System.Text.RegularExpressions
+@inject RagApiClient Api
+
+<PageTitle>Dota 2 RAG</PageTitle>
+
+<div class="shell">
+    <aside class="panel settings">
+        <div class="brand">
+            <span class="brand-mark">D2</span>
+            <div>
+                <div class="brand-title">Dota 2 RAG</div>
+                <div class="muted small">@(options?.Index ?? "подключение к API…")</div>
+            </div>
+        </div>
+
+        <section>
+            <h3>Генерация</h3>
+            <label>LLM
+                <select @bind="req.Llm">
+                    @foreach (var m in options?.Llms ?? [req.Llm]) { <option value="@m">@m</option> }
+                </select>
+            </label>
+            <label>Промпт
+                <select @bind="req.Prompt">
+                    @foreach (var p in options?.Prompts ?? ["strict"]) { <option value="@p">@PromptLabel(p)</option> }
+                </select>
+            </label>
+        </section>
+
+        <section>
+            <h3>Поиск</h3>
+            <label>Кандидатов из индекса (Top-K): <b>@req.TopK</b>
+                <input type="range" min="3" max="50" @bind="req.TopK" @bind:event="oninput" />
+            </label>
+            <label>Reranker
+                <select @bind="req.Reranker">
+                    @foreach (var r in options?.Rerankers ?? ["none", "mminilm"]) { <option value="@r">@r</option> }
+                </select>
+            </label>
+            <label>Chunks в контекст LLM: <b>@req.TopN</b>
+                <input type="range" min="1" max="10" @bind="req.TopN" @bind:event="oninput" />
+            </label>
+        </section>
+
+        <section>
+            <h3>Фильтры</h3>
+            <label>Порог cosine similarity: <b>@req.ScoreThreshold.ToString("0.00")</b>
+                <input type="range" min="0" max="0.95" step="0.01" @bind="req.ScoreThreshold" @bind:event="oninput" />
+            </label>
+            <label>Порог reranker: <b>@req.RerankThreshold.ToString("0.00")</b>
+                <input type="range" min="0" max="0.9" step="0.01" @bind="req.RerankThreshold" @bind:event="oninput" />
+            </label>
+            <div class="chips">
+                @foreach (var s in options?.Sources ?? []) {
+                    <button class="chip @(req.Filters.Source.Contains(s) ? "on" : "")" @onclick="() => Toggle(req.Filters.Source, s)">@SourceLabel(s)</button>
+                }
+            </div>
+            <div class="chips">
+                @foreach (var t in options?.EntityTypes ?? []) {
+                    <button class="chip @(req.Filters.EntityType.Contains(t) ? "on" : "")" @onclick="() => Toggle(req.Filters.EntityType, t)">@TypeLabel(t)</button>
+                }
+            </div>
+            <div class="muted small">Ничего не выбрано — ищем по всей базе.</div>
+        </section>
+    </aside>
+
+    <main class="chat">
+        <div class="messages">
+            @if (history.Count == 0 && !busy)
+            {
+                <div class="empty">
+                    <h1>Спросите что-нибудь о Dota 2</h1>
+                    <p class="muted">Ответ строится только по базе знаний: официальный сайт dota2.com и Dota 2 Wiki. Каждое утверждение — со ссылкой на источник.</p>
+                    <div class="examples">
+                        @foreach (var ex in examples) { <button class="example" @onclick="() => AskExample(ex)">@ex</button> }
+                    </div>
+                </div>
+            }
+            @foreach (var turn in history)
+            {
+                <div class="q">@turn.Question</div>
+                @if (turn.Error is not null)
+                {
+                    <div class="card error">@turn.Error</div>
+                }
+                else if (turn.Response is { } r)
+                {
+                    <div class="card answer @(r.Refused ? "refused" : "")">
+                        @if (r.Refused) { <div class="badge warn">нет данных в базе</div> }
+                        <div class="answer-text">@RenderAnswer(r.Answer)</div>
+
+                        @if (r.Sources.Count > 0)
+                        {
+                            <div class="sources">
+                                <div class="label">Источники</div>
+                                @foreach (var s in r.Sources)
+                                {
+                                    <a class="source" href="@s.Url" target="_blank" rel="noopener">
+                                        <span class="num">@s.N</span>
+                                        <span>@s.Title — @s.Section</span>
+                                        <span class="tag">@SourceLabel(s.Source)</span>
+                                    </a>
+                                }
+                            </div>
+                        }
+
+                        <details class="context">
+                            <summary>Контекст для LLM: @r.Context.Count chunks · отброшено @r.Dropped.Count · @Timings(r)</summary>
+                            @foreach (var c in r.Context)
+                            {
+                                <div class="ctx">
+                                    <div class="ctx-head">
+                                        <span class="num">@c.N</span>
+                                        <b>@c.Title</b> <span class="muted">— @c.Section</span>
+                                        <span class="tag">@SourceLabel(c.Source)</span>
+                                    </div>
+                                    <div class="scores">
+                                        <Score Label="cosine" Value="c.DenseScore" />
+                                        <Score Label="rerank" Value="c.RerankScore" />
+                                    </div>
+                                    <pre>@c.Text</pre>
+                                </div>
+                            }
+                            @if (r.Dropped.Count > 0)
+                            {
+                                <div class="label">Не прошли в контекст</div>
+                                <table class="dropped">
+                                    <thead><tr><th>Документ</th><th>cosine</th><th>rerank</th></tr></thead>
+                                    <tbody>
+                                    @foreach (var d in r.Dropped)
+                                    {
+                                        <tr><td>@d.Title — @d.Section</td><td>@Fmt(d.DenseScore)</td><td>@Fmt(d.RerankScore)</td></tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            }
+                            <div class="muted small">Фильтры: @string.Join(", ", r.FilterLog.Select(kv => $"{kv.Key}={kv.Value}")) · LLM: @r.Llm
+                                @if (r.Tokens is { } t) { <span> · токены @t.Prompt + @t.Completion</span> }
+                            </div>
+                        </details>
+                    </div>
+                }
+            }
+            @if (busy) { <div class="card thinking"><span class="dot"></span><span class="dot"></span><span class="dot"></span> Ищу в базе знаний…</div> }
+        </div>
+
+        <form class="composer" @onsubmit="Ask" @onsubmit:preventDefault>
+            <input @bind="question" @bind:event="oninput" placeholder="Например: чем Silence отличается от Break?" disabled="@busy" />
+            <button type="submit" disabled="@(busy || string.IsNullOrWhiteSpace(question))">Спросить</button>
+        </form>
+    </main>
+</div>
+
+@code {
+    private RagOptions? options;
+    private readonly AskRequest req = new();
+    private string question = "";
+    private bool busy;
+    private readonly List<Turn> history = [];
+
+    private readonly string[] examples =
+    [
+        "Сколько стоит Blink Dagger и какая у него перезарядка?",
+        "Чем Silence отличается от Break?",
+        "Что изменили у Axe в патче 7.41e?",
+        "Кто выиграл The International 2019?",
+    ];
+
+    private sealed record Turn(string Question)
+    {
+        public AskResponse? Response { get; set; }
+        public string? Error { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { options = await Api.GetOptionsAsync(); }
+        catch (Exception) { options = null; }
+    }
+
+    private Task AskExample(string ex) { question = ex; return Ask(); }
+
+    private async Task Ask()
+    {
+        if (string.IsNullOrWhiteSpace(question) || busy) return;
+        var turn = new Turn(question.Trim());
+        history.Add(turn);
+        busy = true;
+        question = "";
+        try
+        {
+            req.Question = turn.Question;
+            turn.Response = await Api.AskAsync(req);
+        }
+        catch (Exception e)
+        {
+            turn.Error = e is HttpRequestException
+                ? "Не удалось подключиться к Python API (python -m uvicorn src.api.app:app --port 8000)."
+                : e.Message;
+        }
+        finally { busy = false; }
+    }
+
+    private static void Toggle(List<string> list, string v)
+    {
+        if (!list.Remove(v)) list.Add(v);
+    }
+
+    // [1][2] в ответе → кружки-ссылки
+    private static RenderFragment RenderAnswer(string text) => builder =>
+    {
+        var seq = 0;
+        foreach (var part in Regex.Split(text, @"(\[\d+\])"))
+        {
+            var m = Regex.Match(part, @"^\[(\d+)\]$");
+            if (m.Success)
+            {
+                builder.OpenElement(seq++, "sup");
+                builder.AddAttribute(seq++, "class", "cite");
+                builder.AddContent(seq++, m.Groups[1].Value);
+                builder.CloseElement();
+            }
+            else builder.AddContent(seq++, part);
+        }
+    };
+
+    private static string Timings(AskResponse r) =>
+        string.Join(" · ", r.Timings.Select(kv => $"{kv.Key} {kv.Value:0.00}с"));
+
+    private static string Fmt(double? v) => v is null ? "—" : v.Value.ToString("0.000");
+    private static string SourceLabel(string s) => s == "official" ? "dota2.com" : s == "fandom" ? "Wiki" : s;
+    private static string PromptLabel(string p) => p == "strict" ? "строгий (только контекст + ссылки)" : "базовый";
+    private static string TypeLabel(string t) => t switch
+    {
+        "hero" => "Герои", "item" => "Предметы", "patch" => "Патчи", "mechanic" => "Механики", _ => t
+    };
+}
