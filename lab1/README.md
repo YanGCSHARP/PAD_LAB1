@@ -8,7 +8,26 @@
 - **Вопросы:** на русском (кросс-язычный поиск по смешанному корпусу).
 - **Стек:** Python (pipeline, эксперименты) + Blazor WebAssembly (.NET 10, интерфейс) + Qdrant (Docker) + Groq / Gemini API.
 
-Результаты экспериментов и выводы — в [experiments/REPORT.md](experiments/REPORT.md).
+Результаты экспериментов и выводы — в [experiments/REPORT.md](experiments/REPORT.md),
+отчёт в Word — [report/LR1_RAG_Dota2.docx](report/LR1_RAG_Dota2.docx).
+
+## Результаты коротко
+
+- **Корпус:** 765 документов (127 героев, 408 предметов и 6 патчей с dota2.com; 125 героев и 99 механик с Fandom), ≈ 4 млн символов.
+- **Датасет:** 41 вопрос пяти типов, включая 7 вопросов без ответа в базе.
+
+| | Hit@1 | Hit@5 | MRR |
+|---|---|---|---|
+| База: section-256, e5-small, dense | 0,500 | 0,765 | 0,635 |
+| **Итог: section-128, bge-m3, hybrid, reranker bge-m3** | **0,853** | **0,941** | **0,885** |
+
+| Генерация (судья — Gemini, 1–5) | Correctness | Faithfulness | Верные отказы |
+|---|---|---|---|
+| **gpt-oss-120b, строгий промпт** | **4,65** | 4,85 | **100%** |
+| gpt-oss-120b, базовый промпт | 4,56 | 3,95 | 0% — модель выдумывает ответы |
+
+Самые сильные эффекты: заголовок «Документ — Секция» в chunk'е (MRR ×1,9), reranker (+18% MRR),
+строгий промпт (от 0% до 100% отказов на вопросах без ответа).
 
 ---
 
@@ -111,12 +130,18 @@ python -m uvicorn src.api.app:app --port 8000          # API + UI → http://loc
 Эксперименты и тесты:
 
 ```bash
-python experiments/prebuild.py grid          # заранее построить индексы сетки chunking (долго на CPU)
-python experiments/run_retrieval.py          # этапы S1–S7 (без LLM)
-python experiments/run_generation.py         # LLM × промпт + судья
-python experiments/make_figures.py           # графики в experiments/figures
+python experiments/run_retrieval.py          # этапы S1–S7 (без LLM); на GPU ~15 мин, на CPU — часы
+python experiments/run_generation.py         # LLM × промпт + судья (~30 мин из-за лимитов API)
+python experiments/run_generation.py --resummarize   # пересчитать сводку без запросов к API
+python experiments/make_figures.py           # графики → experiments/figures/*.svg
+python experiments/export_png.py             # SVG → PNG через браузер (http://localhost:8765)
+python experiments/build_docx.py             # отчёт → report/LR1_RAG_Dota2.docx
 python -m pytest tests
 ```
+
+Эксперименты с поиском запускались на ПК с RTX 5060 Ti: код сам использует CUDA, если она есть
+(torch ставить с `--index-url https://download.pytorch.org/whl/cu128`). Векторы кэшируются в
+`data/cache/`, поэтому на ноутбуке итоговый индекс собирается из кэша за ~30 секунд.
 
 Повторный запуск `grab` не скачивает неизменённое: страницы Fandom сверяются по
 `revid`, патчи — по номеру, остальное — по SHA-256 содержимого.
@@ -131,13 +156,14 @@ python -m pytest tests
 |---|---|---|---|
 | Источники | dota2.com `/datafeed` + Fandom MediaWiki API | официальный сайт рендерится JS, но данные приходят из JSON API — стабильно и структурировано; Fandom даёт механики и подробности | Liquipedia (киберспорт, лимит 1 запрос/2 с, `parse` — 1/30 с), парсинг HTML в headless-браузере |
 | Инкрементальность | `revid` / номер патча / SHA-256 + манифест SQLite | дешёвая проверка без скачивания, где источник это позволяет; иначе — по содержимому | ETag (dota2.com отдаёт только `Last-Modified`, который меняется при каждом запросе) |
-| Chunking | см. эксперимент S1–S3 | | fixed, overlap, paragraph, section |
+| Chunking | section-128 + заголовок «Документ — Секция» | лучший MRR (S1), overlap не помог (S2), заголовок ×1,9 MRR (S3) | fixed, overlap, paragraph, 256/512 |
 | Токенизация | токенизатор XLM-R | общий у всех трёх семейств embedding-моделей → chunk точно влезает в модель | символы / слова |
-| Embeddings | см. S4 | корпус RU+EN, вопросы RU → нужны мультиязычные модели | e5-small/base, MiniLM, bge-m3 |
+| Embeddings | bge-m3 | лучший MRR на RU-вопросах и устойчив к смене языка (S4) | e5-small/base, MiniLM |
 | Vector DB | Qdrant (Docker) | фильтрация по payload (metadata) прямо в запросе, коллекция на конфигурацию, веб-панель, тот же API в проде | FAISS (нет metadata-фильтров), Chroma |
-| Reranker | см. S6 | cross-encoder видит вопрос и chunk вместе | mMiniLM (быстрый), bge-reranker-v2-m3 (точный) |
-| LLM | Groq: gpt-oss-120b, qwen3.8-27b (open-weight) | бесплатно, быстро, open-weight модели; ноутбук без GPU | локальный Ollama (медленно на CPU) |
-| Судья | Gemini Flash | другое семейство → меньше «самооценки» | та же модель, что генерирует |
+| Поиск | hybrid (dense + BM25, RRF), 10 кандидатов | +0,09 Hit@1 к dense (S5) | dense, BM25 |
+| Reranker | bge-reranker-v2-m3, 10 → 5 | +18% MRR (S6) | без reranker, mMiniLM |
+| LLM | gpt-oss-120b (Groq) + строгий промпт | лучший correctness и 100% верных отказов (раздел 4 отчёта) | qwen3.8-27b, базовый промпт, локальный Ollama (медленно на CPU) |
+| Судья | Gemini 3.5 Flash-Lite | другое семейство → меньше «самооценки»; у 3.8 Flash на бесплатном тарифе слишком частые 429/503 | та же модель, что генерирует |
 
 ### Защита от галлюцинаций
 

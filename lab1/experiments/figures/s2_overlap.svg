@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" font-family="Segoe UI, Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<text x="16" y="24" font-size="15" font-weight="600" fill="#0b0b0b">S2. Fixed-128: влияние overlap</text>
+<text x="16" y="42" font-size="11.5" fill="#52514e">e5-small, dense-поиск</text>
+<line x1="52" x2="544" y1="256.0" y2="256.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="260.0" text-anchor="end" font-size="11" fill="#8a8983">0,0</text>
+<line x1="52" x2="544" y1="216.4" y2="216.4" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="220.4" text-anchor="end" font-size="11" fill="#8a8983">0,2</text>
+<line x1="52" x2="544" y1="176.8" y2="176.8" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="180.8" text-anchor="end" font-size="11" fill="#8a8983">0,4</text>
+<line x1="52" x2="544" y1="137.2" y2="137.2" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="141.2" text-anchor="end" font-size="11" fill="#8a8983">0,6</text>
+<line x1="52" x2="544" y1="97.6" y2="97.6" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="101.6" text-anchor="end" font-size="11" fill="#8a8983">0,8</text>
+<line x1="52" x2="544" y1="58.0" y2="58.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="62.0" text-anchor="end" font-size="11" fill="#8a8983">1,0</text>
+<path d="M52.0,125.3 L216.0,129.2 L380.0,132.5 L544.0,128.1" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="52.0" cy="125.3" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>MRR · 0: 0,660</title></circle>
+<circle cx="216.0" cy="129.2" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>MRR · 12: 0,640</title></circle>
+<circle cx="380.0" cy="132.5" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>MRR · 25: 0,624</title></circle>
+<circle cx="544.0" cy="128.1" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>MRR · 50: 0,646</title></circle>
+<text x="538.0" y="119.1" text-anchor="end" font-size="11" fill="#52514e">MRR</text>
+<path d="M52.0,116.2 L216.0,116.2 L380.0,110.4 L544.0,116.2" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="52.0" cy="116.2" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>Recall@5 · 0: 0,706</title></circle>
+<circle cx="216.0" cy="116.2" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>Recall@5 · 12: 0,706</title></circle>
+<circle cx="380.0" cy="110.4" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>Recall@5 · 25: 0,735</title></circle>
+<circle cx="544.0" cy="116.2" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>Recall@5 · 50: 0,706</title></circle>
+<text x="538.0" y="107.2" text-anchor="end" font-size="11" fill="#52514e">Recall@5</text>
+<text x="52.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0%</text>
+<text x="216.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">12%</text>
+<text x="380.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">25%</text>
+<text x="544.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">50%</text>
+<text x="298.0" y="290" text-anchor="middle" font-size="11" fill="#52514e">перекрытие, % от размера chunk</text>
+<rect x="52" y="297" width="10" height="10" rx="2" fill="#2a78d6"/>
+<text x="67" y="306" font-size="11.5" fill="#52514e">MRR</text>
+<rect x="110.6" y="297" width="10" height="10" rx="2" fill="#eb6834"/>
+<text x="125.6" y="306" font-size="11.5" fill="#52514e">Recall@5</text>
+</svg>

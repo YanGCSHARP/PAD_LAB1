@@ -28,7 +28,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 CFG = load_config()
 LLM_CHOICES = ["groq:openai/gpt-oss-120b", "groq:qwen/qwen3.8-27b", "groq:openai/gpt-oss-20b",
-               "gemini:gemini-3.8-flash"]
+               "gemini:gemini-3.5-flash-lite"]
 _state: dict = {}
 
 
@@ -51,15 +51,16 @@ class Filters(BaseModel):
 
 
 class AskRequest(BaseModel):
+    # значения по умолчанию — итоговая конфигурация из configs/default.yaml
     question: str = Field(min_length=2, max_length=500)
-    top_k: int = Field(20, ge=1, le=50)
-    reranker: str = "mminilm"         # none / mminilm / bge-m3
-    top_n: int = Field(5, ge=1, le=20)
-    score_threshold: float = 0.0
-    rerank_threshold: float = 0.0
+    top_k: int = Field(CFG["retrieval"]["top_k"], ge=1, le=50)
+    reranker: str = CFG["reranker"]["model"] if CFG["reranker"]["enabled"] else "none"
+    top_n: int = Field(CFG["reranker"]["top_n"], ge=1, le=20)
+    score_threshold: float = CFG["filtering"]["score_threshold"]
+    rerank_threshold: float = CFG["reranker"]["min_score"]
     filters: Filters = Filters()
     llm: str = LLM_CHOICES[0]
-    prompt: str = "strict"
+    prompt: str = CFG["generation"]["prompt"]
 
 
 @app.on_event("startup")

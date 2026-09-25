@@ -20,7 +20,8 @@ sys.path.insert(0, str(ROOT))
 from src.config import load_config, merged  # noqa: E402
 from src.evaluation import load_questions  # noqa: E402
 from src.evaluation.runner import eval_generation  # noqa: E402
-from src.evaluation.table import avg, fmt_table, write_csv  # noqa: E402
+from src.evaluation.table import avg, fmt_table, read_csv, write_csv  # noqa: E402
+from src.generation import is_refusal  # noqa: E402
 from src.generation.llm import build_llm  # noqa: E402
 from src.pipeline import RAGPipeline  # noqa: E402
 
@@ -68,6 +69,10 @@ def main(only: str | None) -> None:
 
     if not all_rows:
         return
+    summarize(all_rows, save=not only)
+
+
+def summarize(all_rows: list[dict], save: bool = True) -> None:
     summary = []
     for tag, *_ in VARIANTS:
         rows = [r for r in all_rows if r["tag"] == tag]
@@ -87,12 +92,24 @@ def main(only: str | None) -> None:
             "prompt_tokens": avg(rows, "prompt_tokens"),
         })
     print(fmt_table(summary))
-    if not only:
+    if save:
         write_csv(RES / "generation_summary.csv", summary)
         write_csv(RES / "generation_all.csv", all_rows)
+
+
+def resummarize() -> None:
+    """Пересчитать сводку по сохранённым ответам (без запросов к API),
+    например после уточнения детектора отказов."""
+    rows = read_csv(RES / "generation_all.csv")
+    for r in rows:
+        r["refused"] = is_refusal(str(r["answer"]))
+        r["refusal_correct"] = r["refused"] != r["answerable"]
+    summarize(rows)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--only")
-    main(ap.parse_args().only)
+    ap.add_argument("--resummarize", action="store_true", help="пересчитать сводку без запросов к API")
+    a = ap.parse_args()
+    resummarize() if a.resummarize else main(a.only)

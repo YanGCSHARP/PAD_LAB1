@@ -69,7 +69,7 @@ def fig_embeddings():
         models, {"вопрос на русском": [pick(rows, embedding=m, query_lang="ru")["mrr"] for m in models],
                  "вопрос на английском": [pick(rows, embedding=m, query_lang="en")["mrr"] for m in models]},
         ymax=1).save(FIG / "s4_embeddings_mrr.svg")
-    Chart("S4. Цена модели: построение индекса на CPU", 560, 300, "секунды, ноутбук Ryzen 5 220 без GPU").bars(
+    Chart("S4. Цена модели: построение индекса", 560, 300, "секунды, RTX 5060 Ti, включая загрузку модели").bars(
         models, {"время, с": [pick(rows, embedding=m, query_lang="ru")["build_sec"] for m in models]},
         vfmt="{:.0f}", yfmt="{:.0f}").save(FIG / "s4_embeddings_time.svg")
 
@@ -83,7 +83,7 @@ def fig_mode():
         metrics, {r["mode"]: [r[m] for m in metrics] for r in rows}, ymax=1).save(FIG / "s5_mode.svg")
     state = json.loads((RES / "best_config.json").read_text(encoding="utf-8"))
     row = pick(rows, mode=state.get("mode", "dense"))
-    ks = [1, 3, 5, 10, 20]
+    ks = [3, 5, 10, 20]
     Chart(f"Top-K: полнота и точность поиска ({row['mode']})", 560, 320).lines(
         ks, {"Recall@K": [row[f"recall@{k}"] for k in ks],
              "Hit@K": [row[f"hit@{k}"] for k in ks]},
@@ -102,16 +102,27 @@ def fig_reranker():
         labels, {"задержка, с": [r["latency"] for r in rows]}, yfmt="{:.1f}").save(FIG / "s6_latency.svg")
 
 
+def threshold_curve(scores: list[dict], col: str, grid: list[float]) -> list[dict]:
+    """Доли по порогу, посчитанные прямо по максимальным скорам вопросов."""
+    ans = [r for r in scores if r["answerable"]]
+    una = [r for r in scores if not r["answerable"]]
+    return [{"threshold": t,
+             "kept": sum(r[col] >= t for r in ans) / len(ans),
+             "blocked": sum(r[col] < t for r in una) / len(una)} for t in grid]
+
+
 def fig_thresholds():
-    rows = read_csv(RES / "retrieval_s7_thresholds.csv")
-    if not rows:
+    scores = read_csv(RES / "retrieval_s7_scores.csv")
+    if not scores:
         return
-    for kind, title in (("dense", "cosine similarity"), ("rerank", "reranker")):
-        d = [r for r in rows if r["kind"] == kind]
-        Chart(f"S7. Порог {title}: отвечаемые vs неотвечаемые", 600, 320).lines(
+    grids = {"dense": ("top_dense", "cosine similarity", [round(0.40 + 0.025 * i, 3) for i in range(13)]),
+             "rerank": ("top_rerank", "reranker", [0, 0.01, 0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7])}
+    for kind, (col, title, grid) in grids.items():
+        d = threshold_curve(scores, col, grid)
+        Chart(f"S7. Порог {title}: отвечаемые vs неотвечаемые", 640, 320).lines(
             [r["threshold"] for r in d],
-            {"отвечаемые: контекст сохранён": [r["answerable_kept"] for r in d],
-             "неотвечаемые: отсечены": [r["unanswerable_blocked"] for r in d]},
+            {"отвечаемые: контекст сохранён": [r["kept"] for r in d],
+             "неотвечаемые: отсечены": [r["blocked"] for r in d]},
             ymax=1, xfmt="{}", xlabel="порог", end_labels=False).save(FIG / f"s7_threshold_{kind}.svg")
 
 

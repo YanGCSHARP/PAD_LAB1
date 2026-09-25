@@ -21,9 +21,13 @@ class Answer:
     llm: LLMResponse | None = None
 
 
+_REFUSAL_MARKERS = ("недостаточно информации", "нет информации", "отсутствует информация",
+                    "информация отсутствует", "не содержит информации", "не содержат информации")
+
+
 def is_refusal(text: str) -> bool:
     t = text.lower()
-    return "недостаточно информации" in t or "нет информации" in t
+    return any(m in t for m in _REFUSAL_MARKERS)
 
 
 def generate(llm: LLM, prompt_key: str, question: str, hits: list[Hit]) -> Answer:

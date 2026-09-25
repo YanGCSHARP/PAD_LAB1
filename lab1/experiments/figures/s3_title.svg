@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" font-family="Segoe UI, Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<text x="16" y="24" font-size="15" font-weight="600" fill="#0b0b0b">S3. Заголовок «Документ — Секция» в начале chunk</text>
+<line x1="52" x2="544" y1="256.0" y2="256.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="260.0" text-anchor="end" font-size="11" fill="#8a8983">0,0</text>
+<line x1="52" x2="544" y1="213.6" y2="213.6" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="217.6" text-anchor="end" font-size="11" fill="#8a8983">0,2</text>
+<line x1="52" x2="544" y1="171.2" y2="171.2" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="175.2" text-anchor="end" font-size="11" fill="#8a8983">0,4</text>
+<line x1="52" x2="544" y1="128.8" y2="128.8" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="132.8" text-anchor="end" font-size="11" fill="#8a8983">0,6</text>
+<line x1="52" x2="544" y1="86.4" y2="86.4" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="90.4" text-anchor="end" font-size="11" fill="#8a8983">0,8</text>
+<line x1="52" x2="544" y1="44.0" y2="44.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="48.0" text-anchor="end" font-size="11" fill="#8a8983">1,0</text>
+<path d="M78.5,256.0 V203.9 Q78.5,199.9 82.5,199.9 H108.5 Q112.5,199.9 112.5,203.9 V256.0 Z" fill="#2a78d6"><title>без заголовка · hit@1: 0,26</title></path>
+<text x="95.5" y="195.9" text-anchor="middle" font-size="10.5" fill="#52514e">0,26</text>
+<path d="M114.5,256.0 V135.3 Q114.5,131.3 118.5,131.3 H144.5 Q148.5,131.3 148.5,135.3 V256.0 Z" fill="#eb6834"><title>с заголовком · hit@1: 0,59</title></path>
+<text x="131.5" y="127.3" text-anchor="middle" font-size="10.5" fill="#52514e">0,59</text>
+<text x="113.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">hit@1</text>
+<path d="M201.5,256.0 V172.7 Q201.5,168.7 205.5,168.7 H231.5 Q235.5,168.7 235.5,172.7 V256.0 Z" fill="#2a78d6"><title>без заголовка · hit@5: 0,41</title></path>
+<text x="218.5" y="164.7" text-anchor="middle" font-size="10.5" fill="#52514e">0,41</text>
+<path d="M237.5,256.0 V91.7 Q237.5,87.7 241.5,87.7 H267.5 Q271.5,87.7 271.5,91.7 V256.0 Z" fill="#eb6834"><title>с заголовком · hit@5: 0,79</title></path>
+<text x="254.5" y="83.7" text-anchor="middle" font-size="10.5" fill="#52514e">0,79</text>
+<text x="236.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">hit@5</text>
+<path d="M324.5,256.0 V185.7 Q324.5,181.7 328.5,181.7 H354.5 Q358.5,181.7 358.5,185.7 V256.0 Z" fill="#2a78d6"><title>без заголовка · mrr: 0,35</title></path>
+<text x="341.5" y="177.7" text-anchor="middle" font-size="10.5" fill="#52514e">0,35</text>
+<path d="M360.5,256.0 V118.4 Q360.5,114.4 364.5,114.4 H390.5 Q394.5,114.4 394.5,118.4 V256.0 Z" fill="#eb6834"><title>с заголовком · mrr: 0,67</title></path>
+<text x="377.5" y="110.4" text-anchor="middle" font-size="10.5" fill="#52514e">0,67</text>
+<text x="359.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">mrr</text>
+<path d="M447.5,256.0 V182.1 Q447.5,178.1 451.5,178.1 H477.5 Q481.5,178.1 481.5,182.1 V256.0 Z" fill="#2a78d6"><title>без заголовка · recall@5: 0,37</title></path>
+<text x="464.5" y="174.1" text-anchor="middle" font-size="10.5" fill="#52514e">0,37</text>
+<path d="M483.5,256.0 V101.0 Q483.5,97.0 487.5,97.0 H513.5 Q517.5,97.0 517.5,101.0 V256.0 Z" fill="#eb6834"><title>с заголовком · recall@5: 0,75</title></path>
+<text x="500.5" y="93.0" text-anchor="middle" font-size="10.5" fill="#52514e">0,75</text>
+<text x="482.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">recall@5</text>
+<rect x="52" y="297" width="10" height="10" rx="2" fill="#2a78d6"/>
+<text x="67" y="306" font-size="11.5" fill="#52514e">без заголовка</text>
+<rect x="182.60000000000002" y="297" width="10" height="10" rx="2" fill="#eb6834"/>
+<text x="197.60000000000002" y="306" font-size="11.5" fill="#52514e">с заголовком</text>
+</svg>

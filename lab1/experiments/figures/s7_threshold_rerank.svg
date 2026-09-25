@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320" viewBox="0 0 640 320" font-family="Segoe UI, Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<text x="16" y="24" font-size="15" font-weight="600" fill="#0b0b0b">S7. Порог reranker: отвечаемые vs неотвечаемые</text>
+<line x1="52" x2="624" y1="256.0" y2="256.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="260.0" text-anchor="end" font-size="11" fill="#8a8983">0,0</text>
+<line x1="52" x2="624" y1="213.6" y2="213.6" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="217.6" text-anchor="end" font-size="11" fill="#8a8983">0,2</text>
+<line x1="52" x2="624" y1="171.2" y2="171.2" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="175.2" text-anchor="end" font-size="11" fill="#8a8983">0,4</text>
+<line x1="52" x2="624" y1="128.8" y2="128.8" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="132.8" text-anchor="end" font-size="11" fill="#8a8983">0,6</text>
+<line x1="52" x2="624" y1="86.4" y2="86.4" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="90.4" text-anchor="end" font-size="11" fill="#8a8983">0,8</text>
+<line x1="52" x2="624" y1="44.0" y2="44.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="48.0" text-anchor="end" font-size="11" fill="#8a8983">1,0</text>
+<path d="M52.0,44.0 L123.5,50.2 L195.0,56.5 L266.5,62.7 L338.0,62.7 L409.5,62.7 L481.0,68.9 L552.5,68.9 L624.0,81.4" fill="none" stroke="#2a78d6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="52.0" cy="44.0" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0: 1,000</title></circle>
+<circle cx="123.5" cy="50.2" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.01: 0,971</title></circle>
+<circle cx="195.0" cy="56.5" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.02: 0,941</title></circle>
+<circle cx="266.5" cy="62.7" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.05: 0,912</title></circle>
+<circle cx="338.0" cy="62.7" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.1: 0,912</title></circle>
+<circle cx="409.5" cy="62.7" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.2: 0,912</title></circle>
+<circle cx="481.0" cy="68.9" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.3: 0,882</title></circle>
+<circle cx="552.5" cy="68.9" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.5: 0,882</title></circle>
+<circle cx="624.0" cy="81.4" r="4" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>отвечаемые: контекст сохранён · 0.7: 0,824</title></circle>
+<path d="M52.0,256.0 L123.5,134.9 L195.0,104.6 L266.5,74.3 L338.0,44.0 L409.5,44.0 L481.0,44.0 L552.5,44.0 L624.0,44.0" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="52.0" cy="256.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0: 0,000</title></circle>
+<circle cx="123.5" cy="134.9" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.01: 0,571</title></circle>
+<circle cx="195.0" cy="104.6" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.02: 0,714</title></circle>
+<circle cx="266.5" cy="74.3" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.05: 0,857</title></circle>
+<circle cx="338.0" cy="44.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.1: 1,000</title></circle>
+<circle cx="409.5" cy="44.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.2: 1,000</title></circle>
+<circle cx="481.0" cy="44.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.3: 1,000</title></circle>
+<circle cx="552.5" cy="44.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.5: 1,000</title></circle>
+<circle cx="624.0" cy="44.0" r="4" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>неотвечаемые: отсечены · 0.7: 1,000</title></circle>
+<text x="52.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0</text>
+<text x="123.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.01</text>
+<text x="195.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.02</text>
+<text x="266.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.05</text>
+<text x="338.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.1</text>
+<text x="409.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.2</text>
+<text x="481.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.3</text>
+<text x="552.5" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.5</text>
+<text x="624.0" y="272" text-anchor="middle" font-size="11" fill="#52514e">0.7</text>
+<text x="338.0" y="290" text-anchor="middle" font-size="11" fill="#52514e">порог</text>
+<rect x="52" y="297" width="10" height="10" rx="2" fill="#2a78d6"/>
+<text x="67" y="306" font-size="11.5" fill="#52514e">отвечаемые: контекст сохранён</text>
+<rect x="297.8" y="297" width="10" height="10" rx="2" fill="#eb6834"/>
+<text x="312.8" y="306" font-size="11.5" fill="#52514e">неотвечаемые: отсечены</text>
+</svg>

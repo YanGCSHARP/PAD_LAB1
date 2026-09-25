@@ -31,6 +31,8 @@ public sealed class RagOptions
     public List<string> Rerankers { get; set; } = [];
     public List<string> Sources { get; set; } = [];
     [JsonPropertyName("entity_types")] public List<string> EntityTypes { get; set; } = [];
+    /// <summary>Значения по умолчанию из configs/default.yaml (итоговая конфигурация).</summary>
+    public AskRequest? Defaults { get; set; }
 }
 
 public sealed class AskFilters

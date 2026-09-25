@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="330" viewBox="0 0 640 330" font-family="Segoe UI, Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<text x="16" y="24" font-size="15" font-weight="600" fill="#0b0b0b">S1. MRR: стратегия × размер chunk</text>
+<text x="16" y="42" font-size="11.5" fill="#52514e">e5-small, dense-поиск, 34 отвечаемых вопроса</text>
+<line x1="52" x2="624" y1="266.0" y2="266.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="270.0" text-anchor="end" font-size="11" fill="#8a8983">0,0</text>
+<line x1="52" x2="624" y1="224.4" y2="224.4" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="228.4" text-anchor="end" font-size="11" fill="#8a8983">0,2</text>
+<line x1="52" x2="624" y1="182.8" y2="182.8" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="186.8" text-anchor="end" font-size="11" fill="#8a8983">0,4</text>
+<line x1="52" x2="624" y1="141.2" y2="141.2" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="145.2" text-anchor="end" font-size="11" fill="#8a8983">0,6</text>
+<line x1="52" x2="624" y1="99.6" y2="99.6" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="103.6" text-anchor="end" font-size="11" fill="#8a8983">0,8</text>
+<line x1="52" x2="624" y1="58.0" y2="58.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="62.0" text-anchor="end" font-size="11" fill="#8a8983">1,0</text>
+<path d="M94.3,266.0 V132.7 Q94.3,128.7 98.3,128.7 H124.3 Q128.3,128.7 128.3,132.7 V266.0 Z" fill="#2a78d6"><title>fixed · 128 токенов: 0,66</title></path>
+<text x="111.3" y="124.7" text-anchor="middle" font-size="9.5" fill="#52514e">0,66</text>
+<path d="M130.3,266.0 V132.1 Q130.3,128.1 134.3,128.1 H160.3 Q164.3,128.1 164.3,132.1 V266.0 Z" fill="#eb6834"><title>paragraph · 128 токенов: 0,66</title></path>
+<text x="147.3" y="124.1" text-anchor="middle" font-size="9.5" fill="#52514e">0,66</text>
+<path d="M166.3,266.0 V131.1 Q166.3,127.1 170.3,127.1 H196.3 Q200.3,127.1 200.3,131.1 V266.0 Z" fill="#1baf7a"><title>section · 128 токенов: 0,67</title></path>
+<text x="183.3" y="123.1" text-anchor="middle" font-size="9.5" fill="#52514e">0,67</text>
+<text x="147.3" y="282" text-anchor="middle" font-size="11" fill="#52514e">128 токенов</text>
+<path d="M285.0,266.0 V139.4 Q285.0,135.4 289.0,135.4 H315.0 Q319.0,135.4 319.0,139.4 V266.0 Z" fill="#2a78d6"><title>fixed · 256 токенов: 0,63</title></path>
+<text x="302.0" y="131.4" text-anchor="middle" font-size="9.5" fill="#52514e">0,63</text>
+<path d="M321.0,266.0 V143.1 Q321.0,139.1 325.0,139.1 H351.0 Q355.0,139.1 355.0,143.1 V266.0 Z" fill="#eb6834"><title>paragraph · 256 токенов: 0,61</title></path>
+<text x="338.0" y="135.1" text-anchor="middle" font-size="9.5" fill="#52514e">0,61</text>
+<path d="M357.0,266.0 V137.9 Q357.0,133.9 361.0,133.9 H387.0 Q391.0,133.9 391.0,137.9 V266.0 Z" fill="#1baf7a"><title>section · 256 токенов: 0,63</title></path>
+<text x="374.0" y="129.9" text-anchor="middle" font-size="9.5" fill="#52514e">0,63</text>
+<text x="338.0" y="282" text-anchor="middle" font-size="11" fill="#52514e">256 токенов</text>
+<path d="M475.7,266.0 V136.4 Q475.7,132.4 479.7,132.4 H505.7 Q509.7,132.4 509.7,136.4 V266.0 Z" fill="#2a78d6"><title>fixed · 512 токенов: 0,64</title></path>
+<text x="492.7" y="128.4" text-anchor="middle" font-size="9.5" fill="#52514e">0,64</text>
+<path d="M511.7,266.0 V151.6 Q511.7,147.6 515.7,147.6 H541.7 Q545.7,147.6 545.7,151.6 V266.0 Z" fill="#eb6834"><title>paragraph · 512 токенов: 0,57</title></path>
+<text x="528.7" y="143.6" text-anchor="middle" font-size="9.5" fill="#52514e">0,57</text>
+<path d="M547.7,266.0 V143.9 Q547.7,139.9 551.7,139.9 H577.7 Q581.7,139.9 581.7,143.9 V266.0 Z" fill="#1baf7a"><title>section · 512 токенов: 0,61</title></path>
+<text x="564.7" y="135.9" text-anchor="middle" font-size="9.5" fill="#52514e">0,61</text>
+<text x="528.7" y="282" text-anchor="middle" font-size="11" fill="#52514e">512 токенов</text>
+<rect x="52" y="307" width="10" height="10" rx="2" fill="#2a78d6"/>
+<text x="67" y="316" font-size="11.5" fill="#52514e">fixed</text>
+<rect x="125.0" y="307" width="10" height="10" rx="2" fill="#eb6834"/>
+<text x="140.0" y="316" font-size="11.5" fill="#52514e">paragraph</text>
+<rect x="226.8" y="307" width="10" height="10" rx="2" fill="#1baf7a"/>
+<text x="241.8" y="316" font-size="11.5" fill="#52514e">section</text>
+</svg>

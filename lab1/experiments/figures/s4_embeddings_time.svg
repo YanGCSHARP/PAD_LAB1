@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="300" viewBox="0 0 560 300" font-family="Segoe UI, Inter, Arial, sans-serif">
+<rect width="100%" height="100%" fill="#fcfcfb"/>
+<text x="16" y="24" font-size="15" font-weight="600" fill="#0b0b0b">S4. Цена модели: построение индекса</text>
+<text x="16" y="42" font-size="11.5" fill="#52514e">секунды, RTX 5060 Ti, включая загрузку модели</text>
+<line x1="52" x2="544" y1="236.0" y2="236.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="240.0" text-anchor="end" font-size="11" fill="#8a8983">0</text>
+<line x1="52" x2="544" y1="200.4" y2="200.4" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="204.4" text-anchor="end" font-size="11" fill="#8a8983">40</text>
+<line x1="52" x2="544" y1="164.8" y2="164.8" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="168.8" text-anchor="end" font-size="11" fill="#8a8983">80</text>
+<line x1="52" x2="544" y1="129.2" y2="129.2" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="133.2" text-anchor="end" font-size="11" fill="#8a8983">120</text>
+<line x1="52" x2="544" y1="93.6" y2="93.6" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="97.6" text-anchor="end" font-size="11" fill="#8a8983">160</text>
+<line x1="52" x2="544" y1="58.0" y2="58.0" stroke="#e6e5e0" stroke-width="1"/>
+<text x="44" y="62.0" text-anchor="end" font-size="11" fill="#8a8983">200</text>
+<path d="M96.5,236.0 V236.2 Q96.5,235.9 96.8,235.9 H130.2 Q130.5,235.9 130.5,236.2 V236.0 Z" fill="#2a78d6"><title>время, с · e5-small: 0</title></path>
+<text x="113.5" y="231.9" text-anchor="middle" font-size="10.5" fill="#52514e">0</text>
+<text x="113.5" y="252" text-anchor="middle" font-size="11" fill="#52514e">e5-small</text>
+<path d="M219.5,236.0 V199.8 Q219.5,195.8 223.5,195.8 H249.5 Q253.5,195.8 253.5,199.8 V236.0 Z" fill="#2a78d6"><title>время, с · minilm: 45</title></path>
+<text x="236.5" y="191.8" text-anchor="middle" font-size="10.5" fill="#52514e">45</text>
+<text x="236.5" y="252" text-anchor="middle" font-size="11" fill="#52514e">minilm</text>
+<path d="M342.5,236.0 V167.9 Q342.5,163.9 346.5,163.9 H372.5 Q376.5,163.9 376.5,167.9 V236.0 Z" fill="#2a78d6"><title>время, с · e5-base: 81</title></path>
+<text x="359.5" y="159.9" text-anchor="middle" font-size="10.5" fill="#52514e">81</text>
+<text x="359.5" y="252" text-anchor="middle" font-size="11" fill="#52514e">e5-base</text>
+<path d="M465.5,236.0 V81.1 Q465.5,77.1 469.5,77.1 H495.5 Q499.5,77.1 499.5,81.1 V236.0 Z" fill="#2a78d6"><title>время, с · bge-m3: 178</title></path>
+<text x="482.5" y="73.1" text-anchor="middle" font-size="10.5" fill="#52514e">178</text>
+<text x="482.5" y="252" text-anchor="middle" font-size="11" fill="#52514e">bge-m3</text>
+</svg>

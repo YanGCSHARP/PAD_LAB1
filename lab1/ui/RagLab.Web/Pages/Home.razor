@@ -154,7 +154,7 @@
 
 @code {
     private RagOptions? options;
-    private readonly AskRequest req = new();
+    private AskRequest req = new();
     private string question = "";
     private bool busy;
     private readonly List<Turn> history = [];
@@ -175,7 +175,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        try { options = await Api.GetOptionsAsync(); }
+        try
+        {
+            options = await Api.GetOptionsAsync();
+            if (options?.Defaults is { } d) req = d;          // настройки по умолчанию — из конфига сервера
+        }
         catch (Exception) { options = null; }
     }
 

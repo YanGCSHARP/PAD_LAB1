@@ -47,20 +47,20 @@ grabber:
 
 # ---------------------------------------------------------------- pipeline
 chunking:
-  strategy: section        # fixed | paragraph | section
-  size: 256                # токенов (токенизатор XLM-R)
+  strategy: section        # fixed | paragraph | section   (лучшее по S1)
+  size: 128                # токенов (токенизатор XLM-R)   (лучшее по S1)
   overlap: 0               # токенов, только для fixed
   prefix_title: true       # "Название — Секция" в начале chunk
 
 embedding:
-  model: e5-small          # e5-small | e5-base | minilm | bge-m3 (см. src/embeddings)
+  model: bge-m3            # e5-small | e5-base | minilm | bge-m3 (лучшее по S4)
 
 vector_store:
   url: http://localhost:6333   # Qdrant в Docker (docker compose up -d); null → embedded-режим
 
 retrieval:
-  mode: dense              # dense | bm25 | hybrid
-  top_k: 20                # сколько кандидатов достаём из индекса
+  mode: hybrid             # dense | bm25 | hybrid         (лучшее по S5)
+  top_k: 10                # кандидатов из индекса → reranker (лучшее по S6)
   filters: {}              # фильтр по metadata, напр. {source: official, entity_type: [hero, item]}
 
 filtering:
@@ -71,7 +71,7 @@ filtering:
 
 reranker:
   enabled: true
-  model: mminilm           # mminilm | bge-m3
+  model: bge-m3            # mminilm | bge-m3             (лучшее по S6)
   top_n: 5                 # сколько chunks уходит в LLM
   min_score: 0.0           # порог релевантности после rerank (0 — выключено)
 
