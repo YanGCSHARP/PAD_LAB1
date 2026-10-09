@@ -23,3 +23,6 @@ obj/
 
 # собранный Blazor WebAssembly (dotnet publish → lab1/ui/dist)
 lab1/ui/dist/
+
+# окружение Pixi (пересоздаётся командой pixi install; pixi.toml и pixi.lock — в git)
+.pixi/

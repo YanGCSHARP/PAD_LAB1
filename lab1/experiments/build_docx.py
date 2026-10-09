@@ -222,6 +222,10 @@ def main() -> None:
     md = md.split("\n", 1)[1]                             # заголовок отчёта заменён титульным листом
     render_markdown(doc, md)
 
+    # в шаблоне python-docx у <w:zoom> нет обязательного атрибута percent
+    for zoom in doc.settings.element.findall(qn("w:zoom")):
+        zoom.set(qn("w:percent"), "100")
+
     OUT.parent.mkdir(exist_ok=True)
     doc.save(OUT)
     print("saved", OUT)

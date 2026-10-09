@@ -98,7 +98,24 @@ lab1/
 
 ## Запуск
 
-Требования: Python 3.12+ (проверено на 3.14), Docker Desktop, .NET SDK 10 (только для сборки UI).
+Требования: [Pixi](https://pixi.sh) (`winget install prefix-dev.pixi`), Docker Desktop, .NET SDK 10 (только для сборки UI).
+Python отдельно ставить не нужно: Pixi сам ставит Python и все библиотеки в `lab1/.pixi`, точные версии
+зафиксированы в `pixi.lock`.
+
+### Через Pixi (основной способ)
+
+```bash
+cd lab1
+pixi install              # окружение: Python + библиотеки (один раз)
+pixi run check            # ключи API найдены?
+pixi run serve            # Qdrant + API + веб-интерфейс → http://localhost:8000
+pixi run ask "Чем Silence отличается от Break?"
+pixi task list            # все команды: grab, index, test, exp-retrieval, exp-generation, figures, report…
+```
+
+На ПК с видеокартой NVIDIA — окружение с torch под CUDA 12.8: `pixi run -e gpu exp-retrieval`.
+
+### Через pip (альтернатива)
 
 ```bash
 cd lab1
@@ -164,6 +181,18 @@ python -m pytest tests
 | Reranker | bge-reranker-v2-m3, 10 → 5 | +18% MRR (S6) | без reranker, mMiniLM |
 | LLM | gpt-oss-120b (Groq) + строгий промпт | лучший correctness и 100% верных отказов (раздел 4 отчёта) | qwen3.8-27b, базовый промпт, локальный Ollama (медленно на CPU) |
 | Судья | Gemini 3.5 Flash-Lite | другое семейство → меньше «самооценки»; у 3.8 Flash на бесплатном тарифе слишком частые 429/503 | та же модель, что генерирует |
+
+### Наблюдаемость и логи
+
+- **Langfuse** (LLM observability, [src/tracing.py](src/tracing.py)) — каждый вопрос из веб-интерфейса
+  и CLI сохраняется как трейс: `retrieve` (найденные фрагменты и cosine-скоры) → `filter` (сколько
+  отсёк каждый фильтр) → `rerank` (баллы reranker'а) → `llm` (полный промпт, ответ, токены, время).
+  Включается ключами `LANGFUSE_*` в `.env` (см. [.env.example](.env.example)); в интерфейсе под
+  ответом появляется ссылка «Открыть трейс в Langfuse». Прогоны экспериментов не трассируются.
+- **Журнал сбора данных** — `data/manifest.db`: таблица `runs` (каждый запуск grabber'а) и `documents`
+  (версия, хеш, статус, ошибки каждого документа).
+- **Консоль** — логи `logging` (повторы запросов, лимиты API, ошибки; подробно — флаг `-v`) и access-лог uvicorn.
+- **Эксперименты** — `experiments/results/*.csv` по каждому вопросу, кэш запросов к LLM в `data/cache/llm_cache.sqlite`.
 
 ### Защита от галлюцинаций
 

@@ -174,6 +174,14 @@ class DotaOfficialSource(Source):
             f"Тип атаки: {ATTACK.get(h['attack_capability'], '?')}. Сложность: {h['complexity']} из 3.",
             f"Роли: {', '.join(roles)}." if roles else "",
         ]
+        # Список всех способностей одной строкой: каждая способность лежит в своём
+        # разделе, и на вопрос «какие способности у героя» top-5 фрагментов иначе
+        # не покрывают весь список (найдено на вопросе про Invoker с 14 способностями)
+        names = [a["name_loc"] for a in h.get("abilities", []) if a.get("name_loc")]
+        if names:
+            innate = [a["name_loc"] for a in h["abilities"] if a.get("ability_is_innate") and a.get("name_loc")]
+            overview.append(f"Способности (скиллы) героя {name}: {', '.join(names)}."
+                            + (f" Врождённая: {', '.join(innate)}." if innate else ""))
         sections.append(Section("Обзор", "\n".join(x for x in overview if x)))
 
         stats = (

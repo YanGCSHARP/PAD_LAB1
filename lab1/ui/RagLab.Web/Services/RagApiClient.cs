@@ -102,4 +102,5 @@ public sealed class AskResponse
     public Dictionary<string, double> Timings { get; set; } = [];
     public string Llm { get; set; } = "";
     public TokenUsage? Tokens { get; set; }
+    [JsonPropertyName("trace_url")] public string? TraceUrl { get; set; }
 }

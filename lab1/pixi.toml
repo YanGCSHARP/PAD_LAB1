@@ -1,0 +1,62 @@
+# Окружение и команды проекта для Pixi (https://pixi.sh).
+#   pixi install            — создать окружение (Python + все библиотеки, точные версии из pixi.lock)
+#   pixi run serve          — запустить Qdrant и веб-интерфейс http://localhost:8000
+#   pixi run ask "вопрос"   — задать вопрос из консоли
+#   pixi task list          — все команды
+# На ПК с видеокартой NVIDIA: pixi run -e gpu <команда> (torch с CUDA 12.8).
+
+[workspace]
+name = "dota2-rag"
+version = "1.0.0"
+description = "RAG-система по Dota 2: grabber, chunking, bge-m3, Qdrant, hybrid search, reranker, LLM"
+channels = ["conda-forge"]
+platforms = ["win-64"]   # ноутбук и ПК — Windows
+
+[dependencies]
+python = ">=3.12"
+
+[pypi-dependencies]
+# grabber / preprocessing
+requests = ">=2.32"
+tenacity = ">=9.0"
+beautifulsoup4 = ">=4.12"
+lxml = ">=5.0"
+pyyaml = ">=6.0"
+python-dotenv = ">=1.0"
+tqdm = ">=4.66"
+# embeddings / vector store / retrieval
+torch = ">=2.4"
+transformers = ">=4.44"
+qdrant-client = ">=1.12"
+rank-bm25 = ">=0.2.2"
+numpy = ">=1.26"
+# API и наблюдаемость
+fastapi = ">=0.115"
+uvicorn = ">=0.30"
+langfuse = ">=4.0"
+# отчёт и тесты
+python-docx = ">=1.1"
+pytest = ">=8.0"
+
+# окружение для ПК с RTX 5060 Ti: torch под CUDA 12.8 (архитектура Blackwell)
+[feature.gpu.pypi-dependencies]
+torch = { version = ">=2.4", index = "https://download.pytorch.org/whl/cu128" }
+
+[environments]
+default = { solve-group = "default" }
+gpu = { features = ["gpu"] }
+
+[tasks]
+check = { cmd = "python -m src.cli check", description = "проверить API-ключи в .env" }
+grab = { cmd = "python -m src.cli grab", description = "собрать/обновить документы (только изменённое)" }
+stats = { cmd = "python -m src.cli stats", description = "статистика корпуса" }
+qdrant = { cmd = "docker compose up -d", description = "запустить Qdrant в Docker" }
+index = { cmd = "python -m src.cli index", depends-on = ["qdrant"], description = "построить индекс по configs/default.yaml" }
+ask = { cmd = "python -m src.cli ask --show-context", depends-on = ["qdrant"], description = "вопрос из консоли: pixi run ask \"вопрос\"" }
+serve = { cmd = "python -m uvicorn src.api.app:app --port 8000", depends-on = ["qdrant"], description = "веб-интерфейс http://localhost:8000" }
+ui-build = { cmd = "dotnet publish ui/RagLab.Web -c Release -o ui/dist", description = "собрать Blazor UI (нужен .NET 10 SDK)" }
+test = { cmd = "python -m pytest -q tests", description = "тесты" }
+exp-retrieval = { cmd = "python experiments/run_retrieval.py", depends-on = ["qdrant"], description = "эксперименты с поиском S1–S7" }
+exp-generation = { cmd = "python experiments/run_generation.py", depends-on = ["qdrant"], description = "эксперименты LLM × промпт + судья" }
+figures = { cmd = "python experiments/make_figures.py", description = "графики" }
+report = { cmd = "python experiments/build_docx.py", description = "отчёт .docx" }

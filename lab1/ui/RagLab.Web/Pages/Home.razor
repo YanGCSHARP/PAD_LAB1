@@ -138,6 +138,10 @@
                             <div class="muted small">Фильтры: @string.Join(", ", r.FilterLog.Select(kv => $"{kv.Key}={kv.Value}")) · LLM: @r.Llm
                                 @if (r.Tokens is { } t) { <span> · токены @t.Prompt + @t.Completion</span> }
                             </div>
+                            @if (!string.IsNullOrEmpty(r.TraceUrl))
+                            {
+                                <a class="trace-link" href="@r.TraceUrl" target="_blank" rel="noopener">Открыть трейс в Langfuse →</a>
+                            }
                         </details>
                     </div>
                 }

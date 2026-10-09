@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass, field
 
-from src import config
+from src import config, tracing
 from src.embeddings import Embedder
 from src.filtering import FilterConfig, apply_filters
 from src.generation import Answer, build_llm, generate
@@ -60,19 +60,29 @@ class RAGPipeline:
         r, f, rr = cfg["retrieval"], cfg["filtering"], cfg["reranker"]
         t = {}
         t0 = time.perf_counter()
-        candidates = self.retriever.retrieve(question, r["top_k"], r.get("filters") or None)
+        with tracing.span("retrieve", as_type="retriever",
+                          input={"query": question, "mode": r["mode"], "top_k": r["top_k"],
+                                 "embedding": cfg["embedding"]["model"], "filters": r.get("filters")}) as obs:
+            candidates = self.retriever.retrieve(question, r["top_k"], r.get("filters") or None)
+            tracing.update(obs, output=tracing.hits_view(candidates))
         t["retrieve"] = time.perf_counter() - t0
 
-        filtered, flog = apply_filters(list(candidates), FilterConfig(**f))
+        with tracing.span("filter", input={"n": len(candidates), "config": f}) as obs:
+            filtered, flog = apply_filters(list(candidates), FilterConfig(**f))
+            tracing.update(obs, output=flog)
         t0 = time.perf_counter()
-        if rr["enabled"]:
-            final = self.reranker(rr["model"]).rerank(question, filtered, rr["top_n"])
-            if rr.get("min_score"):
-                before = len(final)
-                final = [h for h in final if h.rerank_score >= rr["min_score"]]
-                flog["rerank_threshold"] = before - len(final)
-        else:
-            final = filtered[:rr["top_n"]]
+        with tracing.span("rerank", input={"model": rr["model"] if rr["enabled"] else None,
+                                           "n": len(filtered), "top_n": rr["top_n"],
+                                           "min_score": rr.get("min_score")}) as obs:
+            if rr["enabled"]:
+                final = self.reranker(rr["model"]).rerank(question, filtered, rr["top_n"])
+                if rr.get("min_score"):
+                    before = len(final)
+                    final = [h for h in final if h.rerank_score >= rr["min_score"]]
+                    flog["rerank_threshold"] = before - len(final)
+            else:
+                final = filtered[:rr["top_n"]]
+            tracing.update(obs, output=tracing.hits_view(final))
         t["rerank"] = time.perf_counter() - t0
         return RetrievalResult(candidates, filtered, final, flog, t)
 

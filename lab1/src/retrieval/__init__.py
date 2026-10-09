@@ -27,8 +27,27 @@ class Hit:
 def get_client(location: str) -> QdrantClient:
     """Qdrant: локальный embedded-режим (путь) или сервер (http://...)."""
     if location.startswith("http"):
+        wait_ready(location)
         return QdrantClient(url=location)
     return QdrantClient(path=location)
+
+
+def wait_ready(url: str, timeout_sec: float = 60) -> None:
+    """Сразу после `docker compose up` Qdrant ещё загружает коллекции и рвёт соединения —
+    ждём, пока /readyz не ответит 200."""
+    import time
+
+    import requests
+    deadline = time.monotonic() + timeout_sec
+    while True:
+        try:
+            if requests.get(url.rstrip("/") + "/readyz", timeout=3).status_code == 200:
+                return
+        except requests.RequestException:
+            pass
+        if time.monotonic() > deadline:
+            raise RuntimeError(f"Qdrant не отвечает на {url} — запущен ли `docker compose up -d`?")
+        time.sleep(1)
 
 
 def qdrant_location(cfg: dict) -> str:

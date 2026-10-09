@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from src import tracing
 from src.generation.llm import LLM, LLMResponse, build_llm
 from src.generation.prompts import REFUSAL, build_messages
 from src.retrieval import Hit
@@ -33,7 +34,15 @@ def is_refusal(text: str) -> bool:
 def generate(llm: LLM, prompt_key: str, question: str, hits: list[Hit]) -> Answer:
     if not hits:                                   # нечего отдавать LLM → честный отказ без запроса
         return Answer(REFUSAL, True)
-    resp = llm.chat(build_messages(prompt_key, question, hits))
+    messages = build_messages(prompt_key, question, hits)
+    with tracing.span("llm", as_type="generation", model=llm.model, input=messages,
+                      model_parameters={"temperature": llm.temperature, "max_tokens": llm.max_tokens},
+                      metadata={"provider": llm.provider, "prompt": prompt_key}) as obs:
+        resp = llm.chat(messages)
+        tracing.update(obs, output=resp.text,
+                       usage_details={"input": resp.prompt_tokens, "output": resp.completion_tokens},
+                       metadata={"provider": llm.provider, "prompt": prompt_key, "cached": resp.cached,
+                                 "latency_sec": resp.latency_sec})
     resp.text = _WIDE_CITE.sub(r"[\1]", resp.text)
     cited = sorted({int(n) for n in _CITE.findall(resp.text) if 0 < int(n) <= len(hits)})
     used = cited or list(range(1, len(hits) + 1))  # нет ссылок → показываем весь контекст

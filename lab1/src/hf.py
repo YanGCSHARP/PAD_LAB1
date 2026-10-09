@@ -17,17 +17,27 @@ torch.set_num_threads(os.cpu_count() or 4)
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def from_cache_first(cls, name: str):
+    """Сначала из локального кэша HuggingFace (без сети), иначе — скачать.
+    Без этого при плохом интернете from_pretrained может долго висеть,
+    проверяя обновления модели на сервере."""
+    try:
+        return cls.from_pretrained(name, local_files_only=True)
+    except OSError:
+        return cls.from_pretrained(name)
+
+
 @lru_cache(maxsize=4)
 def load_encoder(name: str):
-    tok = AutoTokenizer.from_pretrained(name)
-    model = AutoModel.from_pretrained(name).to(DEVICE).eval()
+    tok = from_cache_first(AutoTokenizer, name)
+    model = from_cache_first(AutoModel, name).to(DEVICE).eval()
     return tok, model
 
 
 @lru_cache(maxsize=2)
 def load_cross_encoder(name: str):
-    tok = AutoTokenizer.from_pretrained(name)
-    model = AutoModelForSequenceClassification.from_pretrained(name).to(DEVICE).eval()
+    tok = from_cache_first(AutoTokenizer, name)
+    model = from_cache_first(AutoModelForSequenceClassification, name).to(DEVICE).eval()
     return tok, model
 
 

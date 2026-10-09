@@ -88,8 +88,12 @@ def _stats(cfg: dict) -> None:
 
 def _ask(cfg: dict, question: str, show_context: bool) -> None:
     from src.pipeline import RAGPipeline
+    from src import tracing
     rag = RAGPipeline(cfg)
-    answer, res = rag.ask(question)
+    with tracing.trace("rag-ask-cli", input={"question": question}, flush=True) as root:
+        answer, res = rag.ask(question)
+        tracing.update(root, output={"answer": answer.text, "refused": answer.refused})
+        trace_url = tracing.current_trace_url()
     print(answer.text)
     if answer.sources:
         print("\nИсточники:")
@@ -101,6 +105,8 @@ def _ask(cfg: dict, question: str, show_context: bool) -> None:
             print(f"  [{i}] dense={h.dense_score:.3f} rerank={h.rerank_score or 0:.3f}  {h.chunk.chunk_id}")
     print(f"\nфильтры: {res.filter_log}; время: "
           + ", ".join(f"{k}={v:.2f}s" for k, v in res.timings.items()))
+    if trace_url:
+        print(f"трейс в Langfuse: {trace_url}")
 
 
 if __name__ == "__main__":

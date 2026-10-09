@@ -17,6 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+from src import tracing
 from src.config import ROOT, load_config
 from src.generation import build_llm, generate
 from src.generation.prompts import PROMPTS, REFUSAL
@@ -70,7 +71,8 @@ def _warmup() -> None:
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "index": collection_name(CFG), "chunks": len(rag().chunks)}
+    return {"status": "ok", "index": collection_name(CFG), "chunks": len(rag().chunks),
+            "langfuse": tracing.enabled()}
 
 
 @app.get("/api/options")
@@ -92,13 +94,22 @@ def ask(req: AskRequest):
                            top_n=req.top_n, min_score=req.rerank_threshold)
     cfg["generation"].update(prompt=req.prompt)
 
-    res = rag().retrieve(req.question, cfg)
-    t0 = time.perf_counter()
-    try:
-        answer = generate(llm(req.llm), req.prompt, req.question, res.final)
-    except Exception as e:                                   # лимит API и т.п. — показываем в UI
-        raise HTTPException(502, f"ошибка LLM: {e}") from e
-    res.timings["generate"] = time.perf_counter() - t0
+    # один трейс Langfuse на вопрос: retrieve → filter → rerank → llm (если ключи заданы)
+    with tracing.trace("rag-ask", input={"question": req.question},
+                       metadata=req.model_dump(exclude={"question"})) as root:
+        res = rag().retrieve(req.question, cfg)
+        t0 = time.perf_counter()
+        try:
+            answer = generate(llm(req.llm), req.prompt, req.question, res.final)
+        except Exception as e:                               # лимит API и т.п. — показываем в UI
+            tracing.update(root, level="ERROR", status_message=str(e)[:300])
+            raise HTTPException(502, f"ошибка LLM: {e}") from e
+        res.timings["generate"] = time.perf_counter() - t0
+        tracing.update(root, output={"answer": answer.text, "refused": answer.refused,
+                                     "sources": [f"{s['title']} — {s['section']}" for s in answer.sources]},
+                       metadata={**req.model_dump(exclude={"question"}),
+                                 "timings": {k: round(v, 3) for k, v in res.timings.items()}})
+        trace_url = tracing.current_trace_url()
 
     final_ids = {h.chunk.chunk_id for h in res.final}
     return {
@@ -112,7 +123,7 @@ def ask(req: AskRequest):
                     for h in res.candidates if h.chunk.chunk_id not in final_ids][:15],
         "filter_log": res.filter_log, "timings": {k: round(v, 3) for k, v in res.timings.items()},
         "llm": req.llm, "tokens": {"prompt": answer.llm.prompt_tokens, "completion": answer.llm.completion_tokens}
-        if answer.llm else None, "refusal_text": REFUSAL,
+        if answer.llm else None, "refusal_text": REFUSAL, "trace_url": trace_url,
     }
 
 

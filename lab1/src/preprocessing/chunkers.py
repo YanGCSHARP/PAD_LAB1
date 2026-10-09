@@ -24,7 +24,9 @@ _SENT = re.compile(r"(?<=[.!?])\s+")
 @lru_cache(maxsize=1)
 def tokenizer():
     from transformers import AutoTokenizer
-    return AutoTokenizer.from_pretrained(TOKENIZER_NAME)
+
+    from src.hf import from_cache_first
+    return from_cache_first(AutoTokenizer, TOKENIZER_NAME)
 
 
 def n_tokens(text: str) -> int:
